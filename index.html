@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BRIANT HUB — Next-Gen Personal Hub</title>
+  <meta name="description" content="BRIANT HUB — Personal digital hub. Public view + private admin." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+/* ========== BRIANT HUB v2 — Public + Private Admin ========== */
+:root {
+  --primary: #00f0ff;
+  --primary-rgb: 0, 240, 255;
+  --secondary: #7b2fff;
+  --secondary-rgb: 123, 47, 255;
+  --accent: #ff2d95;
+  --accent-rgb: 255, 45, 149;
+  --bg: #05050a;
+  --bg-elevated: #0a0a14;
+  --surface: rgba(15, 15, 30, 0.75);
+  --surface-solid: #0f0f1e;
+  --text: #e8e8f0;
+  --text-muted: #8888a0;
+  --border: rgba(0, 240, 255, 0.15);
+  --glow: 0 0 20px rgba(0, 240, 255, 0.4), 0 0 60px rgba(0, 240, 255, 0.15);
+  --glow-strong: 0 0 30px rgba(0, 240, 255, 0.6), 0 0 80px rgba(0, 240, 255, 0.25);
+  --font-display: 'Orbitron', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+[data-theme="violet"] {
+  --primary: #a855f7; --primary-rgb: 168, 85, 247;
+  --secondary: #6366f1; --secondary-rgb: 99, 102, 241;
+  --accent: #ec4899; --accent-rgb: 236, 72, 153;
+  --border: rgba(168, 85, 247, 0.2);
+  --glow: 0 0 20px rgba(168, 85, 247, 0.4), 0 0 60px rgba(168, 85, 247, 0.15);
+  --glow-strong: 0 0 30px rgba(168, 85, 247, 0.6), 0 0 80px rgba(168, 85, 247, 0.25);
+}
+[data-theme="pink"] {
+  --primary: #ff2d95; --primary-rgb: 255, 45, 149;
+  --secondary: #f472b6; --secondary-rgb: 244, 114, 182;
+  --accent: #00f0ff; --accent-rgb: 0, 240, 255;
+  --border: rgba(255, 45, 149, 0.2);
+  --glow: 0 0 20px rgba(255, 45, 149, 0.4), 0 0 60px rgba(255, 45, 149, 0.15);
+  --glow-strong: 0 0 30px rgba(255, 45, 149, 0.6), 0 0 80px rgba(255, 45, 149, 0.25);
+}
+[data-theme="amber"] {
+  --primary: #fbbf24; --primary-rgb: 251, 191, 36;
+  --secondary: #f59e0b; --secondary-rgb: 245, 158, 11;
+  --accent: #ef4444; --accent-rgb: 239, 68, 68;
+  --border: rgba(251, 191, 36, 0.2);
+  --glow: 0 0 20px rgba(251, 191, 36, 0.4), 0 0 60px rgba(251, 191, 36, 0.15);
+  --glow-strong: 0 0 30px rgba(251, 191, 36, 0.6), 0 0 80px rgba(251, 191, 36, 0.25);
+}
+[data-theme="lime"] {
+  --primary: #a3e635; --primary-rgb: 163, 230, 53;
+  --secondary: #84cc16; --secondary-rgb: 132, 204, 22;
+  --accent: #22d3ee; --accent-rgb: 34, 211, 238;
+  --border: rgba(163, 230, 53, 0.2);
+  --glow: 0 0 20px rgba(163, 230, 53, 0.4), 0 0 60px rgba(163, 230, 53, 0.15);
+  --glow-strong: 0 0 30px rgba(163, 230, 53, 0.6), 0 0 80px rgba(163, 230, 53, 0.25);
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+#particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: 0.55; }
+.cursor-glow {
+  position: fixed; width: 380px; height: 380px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--primary-rgb), 0.08) 0%, transparent 70%);
+  pointer-events: none; z-index: 1; transform: translate(-50%, -50%); mix-blend-mode: screen;
+}
+.gradient-text {
+  background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+  background-size: 200% 200%;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  animation: gradient-shift 6s ease infinite;
+}
+@keyframes gradient-shift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+
+/* NAV */
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 1rem 0;
+  transition: var(--transition); background: transparent;
+}
+.navbar.scrolled {
+  background: rgba(5,5,10,0.88); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border); box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+}
+.nav-container {
+  max-width: 1280px; margin: 0 auto; padding: 0 1.5rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.logo {
+  display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--text);
+  font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; letter-spacing: 0.05em;
+}
+.logo-icon { color: var(--primary); font-size: 1.4rem; text-shadow: var(--glow); }
+.logo .accent { color: var(--primary); }
+.nav-links { display: flex; list-style: none; gap: 1.5rem; flex-wrap: wrap; }
+.nav-link {
+  color: var(--text-muted); text-decoration: none; font-size: 0.88rem; font-weight: 500;
+  letter-spacing: 0.03em; transition: var(--transition); position: relative;
+}
+.nav-link::after {
+  content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px;
+  background: var(--primary); box-shadow: var(--glow); transition: width 0.3s;
+}
+.nav-link:hover, .nav-link.active { color: var(--text); }
+.nav-link:hover::after, .nav-link.active::after { width: 100%; }
+.nav-link.admin-link { color: var(--accent); }
+.nav-link.admin-link::after { background: var(--accent); }
+.nav-cta, .btn {
+  position: relative; padding: 0.55rem 1.25rem; background: transparent;
+  border: 1px solid var(--primary); color: var(--primary);
+  font-family: var(--font-display); font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 0.06em; cursor: pointer; border-radius: 50px; transition: var(--transition);
+}
+.nav-cta:hover, .btn:hover { background: rgba(var(--primary-rgb),0.12); box-shadow: var(--glow); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: #05050a; border: none; box-shadow: var(--glow);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: var(--glow-strong); }
+.btn-ghost { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+.btn.large { padding: 1rem 2.2rem; font-size: 0.9rem; }
+.mobile-toggle { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; }
+.mobile-toggle span { width: 22px; height: 2px; background: var(--text); }
+
+/* HERO */
+.hero {
+  position: relative; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  padding: 6rem 1.5rem 4rem; overflow: hidden;
+}
+.hero-bg { position: absolute; inset: 0; z-index: 0; }
+.orb {
+  position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.35;
+  animation: float 12s ease-in-out infinite;
+}
+.orb-1 { width: 480px; height: 480px; background: var(--primary); top: -10%; right: -5%; }
+.orb-2 { width: 380px; height: 380px; background: var(--secondary); bottom: 10%; left: -8%; animation-delay: -4s; }
+.orb-3 { width: 280px; height: 280px; background: var(--accent); top: 40%; left: 50%; animation-delay: -8s; opacity: 0.22; }
+@keyframes float {
+  0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(30px,-40px) scale(1.05)} 66%{transform:translate(-20px,20px) scale(0.95)}
+}
+.grid-overlay {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(var(--primary-rgb),0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--primary-rgb),0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
+}
+.hero-content { position: relative; z-index: 2; text-align: center; max-width: 780px; }
+.badge {
+  display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 1rem;
+  background: rgba(var(--primary-rgb),0.1); border: 1px solid rgba(var(--primary-rgb),0.3);
+  border-radius: 50px; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em;
+  color: var(--primary); margin-bottom: 1.4rem; font-family: var(--font-display);
+}
+.badge-dot {
+  width: 7px; height: 7px; background: var(--primary); border-radius: 50%;
+  box-shadow: 0 0 10px var(--primary); animation: blink 1.5s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.hero-title {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(2.2rem, 6.5vw, 4.5rem); line-height: 1.1; letter-spacing: 0.02em; margin-bottom: 1.3rem;
+}
+.hero-title .line { display: block; }
+.hero-desc { font-size: 1.05rem; color: var(--text-muted); max-width: 540px; margin: 0 auto 2.2rem; line-height: 1.7; }
+.hero-actions { display: flex; gap: 0.9rem; justify-content: center; flex-wrap: wrap; margin-bottom: 3rem; }
+.hero-stats { display: flex; align-items: center; justify-content: center; gap: 1.8rem; flex-wrap: wrap; }
+.stat { text-align: center; }
+.stat-value { display: block; font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--primary); text-shadow: var(--glow); }
+.stat-label { font-size: 0.78rem; color: var(--text-muted); letter-spacing: 0.05em; }
+.stat-divider { width: 1px; height: 36px; background: var(--border); }
+.scroll-indicator {
+  position: absolute; bottom: 1.8rem; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+  color: var(--text-muted); font-size: 0.68rem; letter-spacing: 0.15em; text-transform: uppercase; z-index: 2;
+}
+.mouse { width: 20px; height: 32px; border: 2px solid var(--border); border-radius: 12px; position: relative; }
+.wheel {
+  width: 3px; height: 7px; background: var(--primary); border-radius: 2px;
+  position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+  animation: scroll-wheel 1.5s ease-in-out infinite;
+}
+@keyframes scroll-wheel { 0%{opacity:1;transform:translateX(-50%) translateY(0)} 100%{opacity:0;transform:translateX(-50%) translateY(12px)} }
+
+/* SECTIONS */
+.section { position: relative; padding: 5.5rem 0; z-index: 2; }
+.container { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+.section-header { text-align: center; margin-bottom: 3rem; }
+.section-tag {
+  display: inline-block; font-family: var(--font-display); font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.18em; color: var(--primary); margin-bottom: 0.7rem;
+}
+.section-title {
+  font-family: var(--font-display); font-size: clamp(1.7rem, 3.8vw, 2.6rem);
+  font-weight: 700; margin-bottom: 0.9rem; letter-spacing: 0.02em;
+}
+.section-desc { color: var(--text-muted); max-width: 500px; margin: 0 auto; font-size: 1rem; }
+
+/* FEATURES */
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.3rem; }
+.feature-card {
+  position: relative; background: var(--surface); backdrop-filter: blur(16px);
+  border: 1px solid var(--border); border-radius: var(--radius); padding: 1.8rem;
+  transition: var(--transition); overflow: hidden;
+}
+.feature-card:hover { border-color: rgba(var(--primary-rgb),0.4); transform: translateY(-4px); box-shadow: var(--glow); }
+.feature-icon {
+  width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;
+  background: rgba(var(--primary-rgb),0.1); border: 1px solid rgba(var(--primary-rgb),0.25);
+  border-radius: 12px; margin-bottom: 1rem; color: var(--primary); font-size: 1.2rem;
+}
+.feature-card h3 { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; margin-bottom: 0.5rem; }
+.feature-card p { color: var(--text-muted); font-size: 0.92rem; line-height: 1.6; }
+
+/* VAULT */
+.vault-window {
+  background: var(--surface); backdrop-filter: blur(20px); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.4), var(--glow);
+}
+.vault-header {
+  display: flex; align-items: center; justify-content: space-between; padding: 0.9rem 1.3rem;
+  background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 0.5rem;
+}
+.vault-dots { display: flex; gap: 6px; }
+.vault-dots span { width: 10px; height: 10px; border-radius: 50%; }
+.vault-dots span:nth-child(1){background:#ff5f57} .vault-dots span:nth-child(2){background:#febc2e} .vault-dots span:nth-child(3){background:#28c840}
+.vault-title { font-family: var(--font-display); font-size: 0.78rem; letter-spacing: 0.1em; color: var(--text-muted); }
+.vault-actions { display: flex; gap: 0.5rem; }
+.vault-btn {
+  padding: 0.35rem 0.85rem; font-size: 0.72rem; font-family: var(--font-display);
+  letter-spacing: 0.05em; border-radius: 6px; border: 1px solid var(--border);
+  background: transparent; color: var(--text-muted); cursor: pointer; transition: var(--transition);
+}
+.vault-btn:hover { border-color: var(--primary); color: var(--primary); }
+.vault-btn.primary { background: rgba(var(--primary-rgb),0.15); border-color: var(--primary); color: var(--primary); }
+.vault-body { display: flex; min-height: 300px; }
+.vault-sidebar { width: 170px; padding: 0.8rem 0; border-right: 1px solid var(--border); background: rgba(0,0,0,0.2); }
+.sidebar-item {
+  display: flex; align-items: center; gap: 0.5rem; padding: 0.65rem 1.1rem;
+  font-size: 0.84rem; color: var(--text-muted); cursor: pointer; transition: var(--transition);
+}
+.sidebar-item:hover, .sidebar-item.active { color: var(--primary); background: rgba(var(--primary-rgb),0.08); }
+.vault-content { flex: 1; padding: 1.3rem; }
+.file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.9rem; }
+.file-card {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 1.1rem 0.9rem; text-align: center; cursor: pointer; transition: var(--transition);
+}
+.file-card:hover { border-color: rgba(var(--primary-rgb),0.4); background: rgba(var(--primary-rgb),0.05); transform: translateY(-2px); }
+.file-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+.file-name { display: block; font-size: 0.82rem; font-weight: 500; margin-bottom: 0.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file-meta { font-size: 0.72rem; color: var(--text-muted); }
+
+/* EXT */
+.ext-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.3rem; }
+.ext-card {
+  background: var(--surface); backdrop-filter: blur(16px); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.4rem; transition: var(--transition);
+}
+.ext-card:hover { border-color: rgba(var(--primary-rgb),0.4); box-shadow: var(--glow); transform: translateY(-3px); }
+.ext-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.9rem; }
+.ext-icon {
+  width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 0.85rem; color: #05050a;
+}
+.ext-icon.cyan { background: linear-gradient(135deg,#00f0ff,#0099ff); }
+.ext-icon.violet { background: linear-gradient(135deg,#a855f7,#6366f1); }
+.ext-icon.pink { background: linear-gradient(135deg,#ff2d95,#f472b6); }
+.ext-icon.amber { background: linear-gradient(135deg,#fbbf24,#f59e0b); }
+.ext-badge {
+  font-size: 0.68rem; padding: 0.22rem 0.55rem; background: rgba(var(--primary-rgb),0.1);
+  border: 1px solid rgba(var(--primary-rgb),0.25); border-radius: 50px; color: var(--primary); font-family: var(--font-display);
+}
+.ext-card h3 { font-family: var(--font-display); font-size: 0.98rem; margin-bottom: 0.35rem; }
+.ext-card p { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1.1rem; }
+.ext-footer { display: flex; justify-content: space-between; align-items: center; }
+.ext-stat { font-size: 0.82rem; color: var(--text-muted); }
+.ext-btn {
+  padding: 0.35rem 0.9rem; font-size: 0.72rem; font-family: var(--font-display); letter-spacing: 0.05em;
+  background: transparent; border: 1px solid var(--primary); color: var(--primary); border-radius: 50px;
+  cursor: pointer; transition: var(--transition);
+}
+.ext-btn:hover { background: rgba(var(--primary-rgb),0.15); box-shadow: var(--glow); }
+
+/* THEME */
+.theme-switcher { display: flex; justify-content: center; gap: 0.7rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+.theme-btn {
+  display: flex; align-items: center; gap: 0.45rem; padding: 0.5rem 1.1rem; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 50px; color: var(--text-muted); font-size: 0.82rem;
+  font-family: var(--font-display); letter-spacing: 0.03em; cursor: pointer; transition: var(--transition);
+}
+.theme-btn:hover, .theme-btn.active { border-color: var(--primary); color: var(--text); box-shadow: var(--glow); }
+.swatch { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 8px currentColor; }
+.swatch.cyan{background:#00f0ff;color:#00f0ff} .swatch.violet{background:#a855f7;color:#a855f7}
+.swatch.pink{background:#ff2d95;color:#ff2d95} .swatch.amber{background:#fbbf24;color:#fbbf24}
+.swatch.lime{background:#a3e635;color:#a3e635}
+.preview-panel { display: flex; justify-content: center; }
+.preview-card {
+  width: 100%; max-width: 480px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; box-shadow: var(--glow);
+}
+.preview-header {
+  padding: 0.7rem 1.1rem; background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--border);
+  font-family: var(--font-display); font-size: 0.78rem; letter-spacing: 0.1em; color: var(--text-muted);
+}
+.preview-body { padding: 1.3rem; }
+.preview-bar {
+  height: 5px; background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+  border-radius: 3px; margin-bottom: 1.3rem; box-shadow: var(--glow);
+}
+.preview-line { height: 9px; background: rgba(255,255,255,0.08); border-radius: 4px; margin-bottom: 0.7rem; }
+.preview-line.short { width: 60%; }
+.preview-blocks { display: flex; gap: 0.7rem; margin-top: 1.3rem; }
+.preview-block { flex: 1; height: 52px; background: rgba(var(--primary-rgb),0.1); border: 1px solid rgba(var(--primary-rgb),0.2); border-radius: 8px; }
+
+/* ABOUT */
+.about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5rem; align-items: center; }
+.about-content .section-tag { margin-bottom: 0.7rem; }
+.about-content .section-title { text-align: left; margin-bottom: 1.1rem; }
+.about-content p { color: var(--text-muted); margin-bottom: 0.9rem; line-height: 1.7; }
+.about-stats { display: flex; gap: 2.2rem; margin-top: 1.8rem; }
+.a-value { display: block; font-family: var(--font-display); font-size: 1.7rem; font-weight: 700; color: var(--primary); text-shadow: var(--glow); }
+.a-label { font-size: 0.78rem; color: var(--text-muted); }
+.hologram { position: relative; width: 260px; height: 260px; display: flex; align-items: center; justify-content: center; margin: 0 auto; }
+.holo-ring { position: absolute; border-radius: 50%; border: 1px solid rgba(var(--primary-rgb),0.3); animation: spin 12s linear infinite; }
+.ring-1 { width: 100%; height: 100%; border-style: dashed; animation-duration: 20s; }
+.ring-2 { width: 75%; height: 75%; border-color: rgba(var(--secondary-rgb),0.4); animation-direction: reverse; animation-duration: 15s; }
+.ring-3 { width: 50%; height: 50%; border-color: rgba(var(--accent-rgb),0.3); animation-duration: 10s; }
+@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+.holo-core {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; color: #05050a;
+  box-shadow: var(--glow-strong); animation: pulse-core 3s ease-in-out infinite;
+}
+@keyframes pulse-core { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+
+/* CTA */
+.cta-section { padding: 3.5rem 0 5.5rem; }
+.cta-box {
+  position: relative; text-align: center; padding: 3.5rem 1.5rem; background: var(--surface);
+  border: 1px solid var(--border); border-radius: calc(var(--radius)*1.4); overflow: hidden;
+}
+.cta-box h2 { font-family: var(--font-display); font-size: clamp(1.4rem, 2.8vw, 2rem); margin-bottom: 0.7rem; }
+.cta-box p { color: var(--text-muted); margin-bottom: 1.8rem; }
+.cta-glow-bg {
+  position: absolute; top: 50%; left: 50%; width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(var(--primary-rgb),0.15) 0%, transparent 70%);
+  transform: translate(-50%,-50%); pointer-events: none;
+}
+
+/* FOOTER */
+.footer { border-top: 1px solid var(--border); padding: 2.2rem 0 1.3rem; position: relative; z-index: 2; }
+.footer-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.6rem; flex-wrap: wrap; gap: 1rem; }
+.footer-brand { display: flex; align-items: center; gap: 0.45rem; font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; }
+.footer-brand .logo-icon { color: var(--primary); text-shadow: var(--glow); }
+.footer-brand .accent { color: var(--primary); }
+.footer-links { display: flex; gap: 1.3rem; flex-wrap: wrap; }
+.footer-links a { color: var(--text-muted); text-decoration: none; font-size: 0.88rem; transition: var(--transition); }
+.footer-links a:hover { color: var(--primary); }
+.footer-bottom {
+  display: flex; justify-content: space-between; align-items: center; padding-top: 1.3rem;
+  border-top: 1px solid var(--border); font-size: 0.78rem; color: var(--text-muted); flex-wrap: wrap; gap: 0.5rem;
+}
+.footer-tag { color: rgba(var(--primary-rgb),0.55); }
+
+/* ========== ADMIN / PRIVATE ========== */
+.admin-gate, .admin-panel { display: none; }
+.admin-gate.active, .admin-panel.active { display: block; }
+
+.admin-overlay {
+  position: fixed; inset: 0; z-index: 2000; background: rgba(5,5,10,0.92);
+  backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+}
+.login-box {
+  width: 100%; max-width: 380px; background: var(--surface-solid); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 2rem; box-shadow: var(--glow-strong); text-align: center;
+}
+.login-box h2 {
+  font-family: var(--font-display); font-size: 1.3rem; margin-bottom: 0.4rem; color: var(--primary);
+}
+.login-box p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+.login-box input {
+  width: 100%; padding: 0.85rem 1rem; background: rgba(0,0,0,0.4); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text); font-size: 1rem; margin-bottom: 1rem;
+  outline: none; transition: var(--transition); font-family: var(--font-body);
+}
+.login-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(var(--primary-rgb),0.15); }
+.login-error { color: #ff6b6b; font-size: 0.85rem; margin-bottom: 0.8rem; min-height: 1.2em; }
+.login-actions { display: flex; gap: 0.7rem; justify-content: center; }
+
+.admin-section {
+  background: linear-gradient(180deg, rgba(var(--primary-rgb),0.06) 0%, transparent 40%);
+  border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+}
+.admin-badge {
+  display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.8rem;
+  background: rgba(255,45,149,0.15); border: 1px solid rgba(255,45,149,0.4);
+  border-radius: 50px; font-size: 0.7rem; font-family: var(--font-display); color: var(--accent);
+  letter-spacing: 0.1em; margin-bottom: 1rem;
+}
+.admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; margin-top: 1.5rem; }
+.admin-card {
+  background: var(--surface); border: 1px solid rgba(var(--accent-rgb),0.25); border-radius: var(--radius);
+  padding: 1.4rem; transition: var(--transition);
+}
+.admin-card:hover { border-color: var(--accent); box-shadow: 0 0 20px rgba(var(--accent-rgb),0.25); }
+.admin-card h3 { font-family: var(--font-display); font-size: 0.95rem; margin-bottom: 0.5rem; color: var(--accent); }
+.admin-card p { font-size: 0.88rem; color: var(--text-muted); margin-bottom: 1rem; }
+.admin-card textarea, .admin-card input[type="text"] {
+  width: 100%; padding: 0.7rem; background: rgba(0,0,0,0.35); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--text); font-family: var(--font-body); font-size: 0.9rem;
+  margin-bottom: 0.8rem; resize: vertical; min-height: 80px; outline: none;
+}
+.admin-card textarea:focus, .admin-card input:focus { border-color: var(--primary); }
+.admin-toolbar {
+  display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: center; justify-content: space-between;
+  margin-bottom: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.25); border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.admin-status { font-size: 0.85rem; color: var(--text-muted); }
+.admin-status strong { color: var(--primary); }
+.logout-btn {
+  padding: 0.45rem 1rem; font-size: 0.75rem; font-family: var(--font-display);
+  background: transparent; border: 1px solid var(--accent); color: var(--accent);
+  border-radius: 50px; cursor: pointer; transition: var(--transition);
+}
+.logout-btn:hover { background: rgba(var(--accent-rgb),0.15); }
+
+/* Public Updates board (visible to all) */
+.updates-list { max-width: 700px; margin: 0 auto; }
+.update-item {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm);
+  padding: 1.1rem 1.3rem; margin-bottom: 0.9rem; transition: var(--transition);
+}
+.update-item:hover { border-color: rgba(var(--primary-rgb),0.35); }
+.update-date { font-size: 0.75rem; color: var(--primary); font-family: var(--font-display); letter-spacing: 0.05em; margin-bottom: 0.35rem; }
+.update-text { font-size: 0.95rem; color: var(--text); line-height: 1.55; }
+.empty-updates { text-align: center; color: var(--text-muted); padding: 2rem; }
+
+/* Toast */
+.toast {
+  position: fixed; bottom: 1.8rem; left: 50%; transform: translateX(-50%) translateY(100px);
+  padding: 0.75rem 1.4rem; background: var(--surface-solid); border: 1px solid var(--primary);
+  border-radius: 50px; color: var(--text); font-size: 0.88rem; box-shadow: var(--glow);
+  z-index: 9999; opacity: 0; transition: all 0.4s cubic-bezier(0.4,0,0.2,1); pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .nav-links { display: none; }
+  .nav-links.open {
+    display: flex; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0;
+    background: rgba(5,5,10,0.96); padding: 1.2rem 1.5rem; gap: 0.9rem;
+    border-bottom: 1px solid var(--border); backdrop-filter: blur(20px);
+  }
+  .mobile-toggle { display: flex; }
+  .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+  .about-content .section-title, .about-content { text-align: center; }
+  .about-stats { justify-content: center; }
+  .vault-body { flex-direction: column; }
+  .vault-sidebar { width: 100%; display: flex; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--border); padding: 0.4rem; }
+  .sidebar-item { white-space: nowrap; }
+}
+@media (max-width: 600px) {
+  .hero-stats { gap: 1rem; }
+  .stat-value { font-size: 1.4rem; }
+  .nav-cta { display: none; }
+  .footer-top, .footer-bottom { flex-direction: column; text-align: center; }
+}
+::selection { background: rgba(var(--primary-rgb),0.3); color: var(--text); }
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(var(--primary-rgb),0.3); border-radius: 4px; }
+
+/* Vault lock */
+.file-card.locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+  position: relative;
+}
+.file-card.locked:hover {
+  transform: none;
+  border-color: var(--border);
+  background: rgba(255,255,255,0.03);
+}
+.file-card .lock-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 0.95rem;
+  filter: drop-shadow(0 0 4px rgba(255,45,149,0.6));
+  display: none;
+}
+.file-card.locked .lock-badge { display: block; }
+.sidebar-item.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+  position: relative;
+}
+.sidebar-item.locked::after {
+  content: '🔒';
+  margin-left: auto;
+  font-size: 0.75rem;
+}
+.vault-lock-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.7rem 1.2rem;
+  background: rgba(0,0,0,0.25);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.vault-lock-bar .lock-label { font-family: var(--font-display); letter-spacing: 0.05em; color: var(--accent); }
+.lock-toggle-btn {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.7rem;
+  font-family: var(--font-display);
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.lock-toggle-btn:hover { border-color: var(--accent); color: var(--accent); }
+.lock-toggle-btn.is-locked {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(var(--accent-rgb),0.12);
+}
+.admin-only { display: none !important; }
+body.is-admin .admin-only { display: flex !important; }
+body.is-admin .admin-only.block { display: block !important; }
+.lock-overlay-msg {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+.lock-overlay-msg .big-lock { font-size: 2.5rem; display: block; margin-bottom: 0.6rem; }
+
+
+/* ===== BRIANT AI Chat ===== */
+.ai-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+.ai-chat-window {
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35), var(--glow);
+  display: flex;
+  flex-direction: column;
+  min-height: 480px;
+  max-height: 70vh;
+}
+.ai-chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.2rem;
+  background: rgba(0,0,0,0.35);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.ai-chat-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+}
+.ai-avatar {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; color: #05050a; font-family: var(--font-display);
+  box-shadow: var(--glow);
+}
+.ai-status {
+  font-size: 0.72rem; color: var(--text-muted);
+  display: flex; align-items: center; gap: 0.35rem;
+}
+.ai-status-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #28c840; box-shadow: 0 0 8px #28c840;
+}
+.ai-status-dot.offline { background: #888; box-shadow: none; }
+.ai-status-dot.busy { background: var(--primary); box-shadow: 0 0 8px var(--primary); animation: blink 1s infinite; }
+.ai-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.ai-msg {
+  max-width: 85%;
+  padding: 0.85rem 1.1rem;
+  border-radius: 14px;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  animation: msgIn 0.3s ease;
+}
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.ai-msg.bot {
+  align-self: flex-start;
+  background: rgba(var(--primary-rgb), 0.1);
+  border: 1px solid rgba(var(--primary-rgb), 0.25);
+  border-bottom-left-radius: 4px;
+}
+.ai-msg.user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, rgba(var(--primary-rgb),0.35), rgba(var(--secondary-rgb),0.25));
+  border: 1px solid rgba(var(--primary-rgb), 0.35);
+  border-bottom-right-radius: 4px;
+}
+.ai-msg .msg-label {
+  font-size: 0.68rem;
+  font-family: var(--font-display);
+  letter-spacing: 0.08em;
+  color: var(--primary);
+  margin-bottom: 0.3rem;
+}
+.ai-msg.user .msg-label { color: var(--text-muted); text-align: right; }
+.ai-msg pre, .ai-msg code {
+  background: rgba(0,0,0,0.35);
+  border-radius: 6px;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.85em;
+  overflow-x: auto;
+}
+.ai-msg pre { padding: 0.7rem; margin: 0.5rem 0; display: block; }
+.ai-input-area {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.9rem 1.1rem;
+  border-top: 1px solid var(--border);
+  background: rgba(0,0,0,0.25);
+}
+.ai-input-area textarea {
+  flex: 1;
+  min-height: 44px;
+  max-height: 120px;
+  padding: 0.7rem 1rem;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  resize: none;
+  outline: none;
+  transition: var(--transition);
+}
+.ai-input-area textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(var(--primary-rgb),0.12);
+}
+.ai-send-btn {
+  width: 48px; height: 48px; border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border: none; cursor: pointer; color: #05050a;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; transition: var(--transition);
+  box-shadow: var(--glow); flex-shrink: 0;
+}
+.ai-send-btn:hover { transform: scale(1.05); box-shadow: var(--glow-strong); }
+.ai-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.ai-config {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+}
+.ai-config h3 {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  margin-bottom: 0.8rem;
+  color: var(--primary);
+}
+.ai-config label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+.ai-config select, .ai-config input {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.9rem;
+  margin-bottom: 0.8rem;
+  outline: none;
+}
+.ai-config select:focus, .ai-config input:focus {
+  border-color: var(--primary);
+}
+.ai-config .hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: 0.5rem;
+}
+.ai-config .hint a { color: var(--primary); }
+.ai-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.8rem;
+}
+.ai-quick button {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.75rem;
+  background: rgba(var(--primary-rgb),0.08);
+  border: 1px solid rgba(var(--primary-rgb),0.25);
+  border-radius: 50px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: var(--font-body);
+}
+.ai-quick button:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.ai-typing {
+  align-self: flex-start;
+  padding: 0.7rem 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: none;
+}
+.ai-typing.show { display: block; }
+.ai-typing span {
+  display: inline-block;
+  width: 6px; height: 6px; margin: 0 2px;
+  background: var(--primary); border-radius: 50%;
+  animation: typingDot 1.2s infinite ease-in-out;
+}
+.ai-typing span:nth-child(2) { animation-delay: 0.2s; }
+.ai-typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingDot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+
+  </style>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+  <div class="cursor-glow" id="cursorGlow"></div>
+
+  <!-- NAV -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#home" class="logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">BRIANT<span class="accent">HUB</span></span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#home" class="nav-link active">Home</a></li>
+        <li><a href="#features" class="nav-link">Features</a></li>
+        <li><a href="#vault" class="nav-link">Vault</a></li>
+        <li><a href="#extensions" class="nav-link">Extensions</a></li>
+        <li><a href="#briant-ai" class="nav-link">BRIANT AI</a></li>
+        <li><a href="#updates" class="nav-link">Updates</a></li>
+        <li><a href="#gallery" class="nav-link">Gallery</a></li>
+        <li><a href="#about" class="nav-link">About</a></li>
+        <li><a href="#admin" class="nav-link admin-link" id="adminNavBtn">Admin</a></li>
+      </ul>
+      <button class="nav-cta" id="openVaultBtn"><span>Open Vault</span></button>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-bg">
+      <div class="orb orb-1"></div>
+      <div class="orb orb-2"></div>
+      <div class="orb orb-3"></div>
+      <div class="grid-overlay"></div>
+    </div>
+    <div class="hero-content">
+      <div class="badge"><span class="badge-dot"></span> NEXT-GEN PERSONAL HUB</div>
+      <h1 class="hero-title">
+        <span class="line">WELCOME TO</span>
+        <span class="line gradient-text">BRIANT HUB</span>
+      </h1>
+      <p class="hero-desc">
+        Pusat digital pribadi yang canggih. Simpan data, share file, distribusi extension,
+        dan kelola aset digital dalam satu tempat yang aman & visual memukau.
+      </p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" id="exploreBtn"><span>Explore Hub</span> →</button>
+        <button class="btn btn-ghost" id="demoBtn"><span>Live Demo</span></button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-value" data-count="1280">0</span><span class="stat-label">Files Stored</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-value" data-count="47">0</span><span class="stat-label">Extensions</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><span class="stat-value" data-count="99">0</span><span class="stat-label">Uptime %</span></div>
+      </div>
+    </div>
+    <div class="scroll-indicator"><div class="mouse"><div class="wheel"></div></div><span>Scroll</span></div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section features" id="features">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">CAPABILITIES</span>
+        <h2 class="section-title">Everything in <span class="gradient-text">One Hub</span></h2>
+        <p class="section-desc">Dirancang untuk performa tinggi, keamanan, dan pengalaman visual yang tidak biasa.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card"><div class="feature-icon">📁</div><h3>Data Vault</h3><p>Simpan file, dokumen, dan aset digital dengan enkripsi & remote sync.</p></div>
+        <div class="feature-card"><div class="feature-icon">🔗</div><h3>Instant Share</h3><p>Bagikan link sharing aman, temporary atau permanent dengan kontrol akses.</p></div>
+        <div class="feature-card"><div class="feature-icon">🧩</div><h3>Extension Hub</h3><p>Distribusi dan kelola browser extension & tools dengan versi control.</p></div>
+        <div class="feature-card"><div class="feature-icon">📊</div><h3>Smart Dashboard</h3><p>Monitor usage, storage, activity log, dan statistik real-time.</p></div>
+        <div class="feature-card"><div class="feature-icon">🛡️</div><h3>Security Layer</h3><p>Multi-layer protection, access token, dan audit trail lengkap.</p></div>
+        <div class="feature-card"><div class="feature-icon">🎨</div><h3>Theme Engine</h3><p>Pilih varian visual: Neon Cyan, Violet Pulse, Ember Gold, dan lainnya.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VAULT -->
+  <section class="section vault" id="vault">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">DATA VAULT</span>
+        <h2 class="section-title">Secure <span class="gradient-text">Storage</span></h2>
+        <p class="section-desc">Interface vault untuk mengelola file dan data penting.</p>
+      </div>
+      <div class="vault-window">
+        <div class="vault-header">
+          <div class="vault-dots"><span></span><span></span><span></span></div>
+          <div class="vault-title">BRIANT • VAULT</div>
+          <div class="vault-actions">
+            <button class="vault-btn">Upload</button>
+            <button class="vault-btn primary">New Folder</button>
+          </div>
+        </div>
+        <div class="vault-lock-bar admin-only" id="vaultLockBar">
+          <span class="lock-label">🔒 Kunci Menu (Admin)</span>
+          <button class="lock-toggle-btn" data-lock="all" id="lockAllBtn">Kunci Semua</button>
+          <button class="lock-toggle-btn" data-lock="folder-projects">Projects</button>
+          <button class="lock-toggle-btn" data-lock="file-notes">notes-v3.md</button>
+          <button class="lock-toggle-btn" data-lock="file-ext">ext-pack.zip</button>
+          <button class="lock-toggle-btn" data-lock="file-keys">keys.enc</button>
+          <button class="lock-toggle-btn" data-lock="folder-brand">brand-kit</button>
+          <button class="lock-toggle-btn" data-lock="file-config">config.json</button>
+          <button class="lock-toggle-btn" data-lock="sidebar-docs">Documents</button>
+          <button class="lock-toggle-btn" data-lock="sidebar-ext">Extensions</button>
+          <button class="lock-toggle-btn" data-lock="sidebar-shared">Shared</button>
+          <button class="lock-toggle-btn" data-lock="sidebar-archive">Archive</button>
+        </div>
+        <div class="vault-body">
+          <div class="vault-sidebar">
+            <div class="sidebar-item active" data-lock-id="sidebar-all"><span>◈</span> All Files</div>
+            <div class="sidebar-item" data-lock-id="sidebar-docs"><span>◉</span> Documents</div>
+            <div class="sidebar-item" data-lock-id="sidebar-ext"><span>◎</span> Extensions</div>
+            <div class="sidebar-item" data-lock-id="sidebar-shared"><span>◇</span> Shared</div>
+            <div class="sidebar-item" data-lock-id="sidebar-archive"><span>◆</span> Archive</div>
+          </div>
+          <div class="vault-content">
+            <div class="file-grid" id="vaultFileGrid">
+              <div class="file-card" data-lock-id="folder-projects"><span class="lock-badge">🔒</span><div class="file-icon">📁</div><div class="file-info"><span class="file-name">Projects</span><span class="file-meta">24 items</span></div></div>
+              <div class="file-card" data-lock-id="file-notes"><span class="lock-badge">🔒</span><div class="file-icon">📄</div><div class="file-info"><span class="file-name">notes-v3.md</span><span class="file-meta">12 KB</span></div></div>
+              <div class="file-card" data-lock-id="file-ext"><span class="lock-badge">🔒</span><div class="file-icon">📦</div><div class="file-info"><span class="file-name">ext-pack.zip</span><span class="file-meta">8.4 MB</span></div></div>
+              <div class="file-card" data-lock-id="file-keys"><span class="lock-badge">🔒</span><div class="file-icon">🔐</div><div class="file-info"><span class="file-name">keys.enc</span><span class="file-meta">2.1 KB</span></div></div>
+              <div class="file-card" data-lock-id="folder-brand"><span class="lock-badge">🔒</span><div class="file-icon">🖼️</div><div class="file-info"><span class="file-name">brand-kit</span><span class="file-meta">Folder</span></div></div>
+              <div class="file-card" data-lock-id="file-config"><span class="lock-badge">🔒</span><div class="file-icon">⚙️</div><div class="file-info"><span class="file-name">config.json</span><span class="file-meta">4 KB</span></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXTENSIONS -->
+  <section class="section extensions" id="extensions">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">EXTENSION HUB</span>
+        <h2 class="section-title">Tools & <span class="gradient-text">Extensions</span></h2>
+        <p class="section-desc">Koleksi extension dan tools siap distribusi.</p>
+      </div>
+      <div class="ext-grid">
+        <div class="ext-card">
+          <div class="ext-header"><div class="ext-icon cyan">BH</div><div class="ext-badge">v1.0.0</div></div>
+          <h3>BRIMOHUB Core</h3><p>Core extension untuk manajemen notifikasi & data sync.</p>
+          <div class="ext-footer"><span class="ext-stat">★ 4.9</span><button class="ext-btn">Install</button></div>
+        </div>
+        <div class="ext-card">
+          <div class="ext-header"><div class="ext-icon violet">DN</div><div class="ext-badge">v2.1.4</div></div>
+          <h3>DANA Sync</h3><p>Bridge & parser notifikasi DANA ke dashboard.</p>
+          <div class="ext-footer"><span class="ext-stat">★ 4.8</span><button class="ext-btn">Install</button></div>
+        </div>
+        <div class="ext-card">
+          <div class="ext-header"><div class="ext-icon pink">VX</div><div class="ext-badge">v0.9.2</div></div>
+          <h3>Vault X</h3><p>Local encrypted storage helper untuk file sensitif.</p>
+          <div class="ext-footer"><span class="ext-stat">★ 4.7</span><button class="ext-btn">Install</button></div>
+        </div>
+        <div class="ext-card">
+          <div class="ext-header"><div class="ext-icon amber">TG</div><div class="ext-badge">v1.3.0</div></div>
+          <h3>Theme Glow</h3><p>Engine tema neon & glassmorphism untuk panel.</p>
+          <div class="ext-footer"><span class="ext-stat">★ 5.0</span><button class="ext-btn">Install</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- BRIANT AI -->
+  <section class="section" id="briant-ai">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">ASSISTANT</span>
+        <h2 class="section-title">BRIANT <span class="gradient-text">AI</span></h2>
+        <p class="section-desc">Chat dengan asisten BRIANT. Pakai API gratis Google Gemini atau Groq — masukkan API key kamu di bawah.</p>
+      </div>
+
+      <div class="ai-layout">
+        <div class="ai-chat-window">
+          <div class="ai-chat-header">
+            <div class="ai-chat-title">
+              <div class="ai-avatar">B</div>
+              <div>
+                <div>BRIANT Assistant</div>
+                <div class="ai-status"><span class="ai-status-dot" id="aiStatusDot"></span> <span id="aiStatusText">Siap</span></div>
+              </div>
+            </div>
+            <button class="btn btn-ghost" id="aiClearBtn" style="padding:0.35rem 0.8rem;font-size:0.72rem">Clear Chat</button>
+          </div>
+          <div class="ai-messages" id="aiMessages">
+            <div class="ai-msg bot">
+              <div class="msg-label">BRIANT AI</div>
+              Halo! Saya asisten BRIANT Hub. Tanyakan apa saja — coding, ide, penjelasan, atau bantu kelola hub kamu.
+              <br><br>
+              <em style="opacity:0.8;font-size:0.9em">Untuk mulai, masukkan API key gratis (Gemini / Groq) di panel konfigurasi di bawah.</em>
+            </div>
+          </div>
+          <div class="ai-typing" id="aiTyping"><span></span><span></span><span></span> BRIANT sedang mengetik...</div>
+          <div class="ai-input-area">
+            <textarea id="aiInput" rows="1" placeholder="Tulis pesan ke BRIANT AI..."></textarea>
+            <button class="ai-send-btn" id="aiSendBtn" title="Kirim">➤</button>
+          </div>
+        </div>
+
+        <div class="ai-config">
+          <h3>⚙️ Konfigurasi API (Gratis)</h3>
+          <label>Provider</label>
+          <select id="aiProvider">
+            <option value="gemini">Google Gemini (gratis — rekomendasi)</option>
+            <option value="groq">Groq — Llama 3.3 (gratis & sangat cepat)</option>
+          </select>
+          <label>API Key</label>
+          <input type="password" id="aiApiKey" placeholder="Tempel API key di sini..." autocomplete="off" />
+          <button class="btn btn-primary" id="aiSaveKeyBtn" style="width:100%;margin-bottom:0.6rem">Simpan Key</button>
+          <div class="hint">
+            <strong>Cara dapat API key gratis:</strong><br>
+            • <strong>Gemini:</strong> buka <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> → Create API key<br>
+            • <strong>Groq:</strong> buka <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a> → Create API Key<br>
+            Key disimpan hanya di browser kamu (localStorage), tidak dikirim ke server BRIANT.
+          </div>
+          <div class="ai-quick">
+            <button type="button" data-q="Apa itu BRIANT HUB?">Apa itu BRIANT HUB?</button>
+            <button type="button" data-q="Beri ide fitur web hub modern">Ide fitur hub</button>
+            <button type="button" data-q="Jelaskan cara publish website gratis">Publish web gratis</button>
+            <button type="button" data-q="Tulis contoh HTML neon glow sederhana">Contoh HTML neon</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PUBLIC UPDATES (semua orang bisa lihat) -->
+  <section class="section" id="updates">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">PUBLIC BOARD</span>
+        <h2 class="section-title">Latest <span class="gradient-text">Updates</span></h2>
+        <p class="section-desc">Update yang dipublish dari Admin akan tampil di sini untuk semua pengunjung.</p>
+      </div>
+      <div class="updates-list" id="publicUpdates">
+        <div class="empty-updates">Belum ada update publik. Admin bisa menambah lewat menu Admin.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY / THEMES -->
+  <section class="section gallery" id="gallery">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">VISUAL VARIANTS</span>
+        <h2 class="section-title">Choose Your <span class="gradient-text">Glow</span></h2>
+        <p class="section-desc">Preset warna neon yang bisa diganti secara real-time.</p>
+      </div>
+      <div class="theme-switcher">
+        <button class="theme-btn active" data-theme="cyan"><span class="swatch cyan"></span> Cyan Neon</button>
+        <button class="theme-btn" data-theme="violet"><span class="swatch violet"></span> Violet Pulse</button>
+        <button class="theme-btn" data-theme="pink"><span class="swatch pink"></span> Magenta Glow</button>
+        <button class="theme-btn" data-theme="amber"><span class="swatch amber"></span> Ember Gold</button>
+        <button class="theme-btn" data-theme="lime"><span class="swatch lime"></span> Acid Lime</button>
+      </div>
+      <div class="preview-panel">
+        <div class="preview-card">
+          <div class="preview-header">Live Preview</div>
+          <div class="preview-body">
+            <div class="preview-bar"></div>
+            <div class="preview-line"></div>
+            <div class="preview-line short"></div>
+            <div class="preview-blocks"><div class="preview-block"></div><div class="preview-block"></div><div class="preview-block"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section about" id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-content">
+          <span class="section-tag">ABOUT</span>
+          <h2 class="section-title">Built for the <span class="gradient-text">Elite</span></h2>
+          <p>BRIANT HUB adalah personal digital headquarters yang dirancang untuk kontrol penuh atas data, tools, dan distribusi digital.</p>
+          <p>Tampilan futuristik, performa tinggi, dan keamanan berlapis. Setiap elemen dibuat dengan perhatian detail.</p>
+          <div class="about-stats">
+            <div class="a-stat"><span class="a-value">100%</span><span class="a-label">Custom Built</span></div>
+            <div class="a-stat"><span class="a-value">0</span><span class="a-label">Dependencies</span></div>
+            <div class="a-stat"><span class="a-value">∞</span><span class="a-label">Possibilities</span></div>
+          </div>
+        </div>
+        <div class="about-visual">
+          <div class="hologram">
+            <div class="holo-ring ring-1"></div>
+            <div class="holo-ring ring-2"></div>
+            <div class="holo-ring ring-3"></div>
+            <div class="holo-core">B</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== ADMIN PANEL (hanya setelah login) ========== -->
+  <section class="section admin-section admin-panel" id="admin">
+    <div class="container">
+      <div class="admin-badge">🔒 PRIVATE — HANYA ADMIN</div>
+      <h2 class="section-title">Admin <span class="gradient-text">Control</span></h2>
+      <p class="section-desc" style="margin-bottom:1.5rem">Area ini hanya terlihat setelah login. Orang lain tidak bisa membuka menu ini.</p>
+
+      <div class="admin-toolbar">
+        <div class="admin-status">Status: <strong id="adminStatus">Logged in</strong></div>
+        <button class="logout-btn" id="logoutBtn">Logout</button>
+      </div>
+
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h3>📝 Publish Update Publik</h3>
+          <p>Tulis update yang akan tampil di halaman Updates untuk semua pengunjung.</p>
+          <textarea id="updateInput" placeholder="Contoh: Versi 1.2 rilis — fitur baru theme engine..."></textarea>
+          <button class="btn btn-primary" id="publishUpdateBtn" style="width:100%">Publish ke Publik</button>
+        </div>
+        <div class="admin-card">
+          <h3>📌 Catatan Pribadi</h3>
+          <p>Catatan hanya untukmu. Tidak tampil ke pengunjung lain.</p>
+          <textarea id="privateNote" placeholder="Catatan rahasia / todo list..."></textarea>
+          <button class="btn btn-ghost" id="saveNoteBtn" style="width:100%">Simpan Catatan</button>
+        </div>
+        <div class="admin-card">
+          <h3>🔑 Ganti Password Admin</h3>
+          <p>Ubah password login Admin (disimpan di browser ini).</p>
+          <input type="password" id="newPass" placeholder="Password baru" style="margin-bottom:0.6rem" />
+          <input type="password" id="newPass2" placeholder="Ulangi password baru" />
+          <button class="btn btn-ghost" id="changePassBtn" style="width:100%;margin-top:0.5rem">Ganti Password</button>
+        </div>
+
+        <div class="admin-card">
+          <h3>🔒 Kunci Vault Menu</h3>
+          <p>Kunci item di BRIANT Vault. Publik tidak bisa membuka item yang dikunci (muncul ikon gembok).</p>
+          <button class="btn btn-ghost" id="adminGotoVaultLock" style="width:100%">Buka Panel Kunci di Vault</button>
+          <p style="font-size:0.8rem;color:var(--text-muted);margin-top:0.8rem">Atau scroll ke Vault — bar kunci hanya muncul setelah login Admin.</p>
+        </div>
+
+        <div class="admin-card">
+          <h3>ℹ️ Info</h3>
+          <p style="margin-bottom:0.6rem"><strong>Password default:</strong> <code style="color:var(--primary)">briant2026</code></p>
+          <p style="margin-bottom:0.6rem">Segera ganti password setelah login pertama.</p>
+          <p style="font-size:0.82rem;color:var(--text-muted)">Catatan: proteksi ini client-side (cukup untuk privasi ringan). Untuk keamanan tinggi gunakan backend / GitHub private.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="section cta-section">
+    <div class="container">
+      <div class="cta-box">
+        <h2>Ready to enter the Hub?</h2>
+        <p>Mulai kelola data, share, dan distribusi tools dalam satu tempat yang powerful.</p>
+        <button class="btn btn-primary large" id="enterHubBtn"><span>Enter BRIANT HUB</span></button>
+        <div class="cta-glow-bg"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div class="footer-brand"><span class="logo-icon">◈</span> BRIANT<span class="accent">HUB</span></div>
+        <div class="footer-links">
+          <a href="#home">Home</a><a href="#features">Features</a><a href="#vault">Vault</a>
+          <a href="#briant-ai">BRIANT AI</a><a href="#updates">Updates</a><a href="#admin">Admin</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 BRIANT HUB. All rights reserved.</span>
+        <span class="footer-tag">Built with precision & neon.</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- LOGIN OVERLAY -->
+  <div class="admin-gate" id="adminGate">
+    <div class="admin-overlay">
+      <div class="login-box">
+        <h2>◈ Admin Access</h2>
+        <p>Masukkan password untuk membuka menu privat.</p>
+        <div class="login-error" id="loginError"></div>
+        <input type="password" id="adminPass" placeholder="Password" autocomplete="current-password" />
+        <div class="login-actions">
+          <button class="btn btn-primary" id="loginBtn">Login</button>
+          <button class="btn btn-ghost" id="cancelLoginBtn">Batal</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+(() => {
+  'use strict';
+
+  // ===== CONFIG =====
+  const DEFAULT_PASS = 'briant2026';
+  const STORAGE_KEY = 'briant_hub_auth';
+  const PASS_KEY = 'briant_hub_pass';
+  const NOTES_KEY = 'briant_hub_notes';
+  const UPDATES_KEY = 'briant_hub_updates';
+
+  // ===== Helpers =====
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => document.querySelectorAll(s);
+
+  function showToast(msg) {
+    const t = $('#toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(showToast._tm);
+    showToast._tm = setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  function getPass() {
+    return localStorage.getItem(PASS_KEY) || DEFAULT_PASS;
+  }
+
+  function isLoggedIn() {
+    return sessionStorage.getItem(STORAGE_KEY) === '1';
+  }
+
+  function setLoggedIn(v) {
+    if (v) sessionStorage.setItem(STORAGE_KEY, '1');
+    else sessionStorage.removeItem(STORAGE_KEY);
+  }
+
+  // ===== Admin UI =====
+  const adminGate = $('#adminGate');
+  const adminPanel = $('#admin');
+
+  function showLogin() {
+    adminGate.classList.add('active');
+    $('#adminPass').value = '';
+    $('#loginError').textContent = '';
+    setTimeout(() => $('#adminPass').focus(), 100);
+  }
+
+  function hideLogin() {
+    adminGate.classList.remove('active');
+  }
+
+  function showAdminPanel() {
+    adminPanel.classList.add('active');
+    loadPrivateNote();
+    loadPublicUpdates();
+  }
+
+  function hideAdminPanel() {
+    adminPanel.classList.remove('active');
+  }
+
+  function requireAdmin(e) {
+    if (e) e.preventDefault();
+    if (isLoggedIn()) {
+      hideLogin();
+      showAdminPanel();
+      adminPanel.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      showLogin();
+    }
+  }
+
+  // Nav Admin click
+  $('#adminNavBtn')?.addEventListener('click', requireAdmin);
+
+  // Login
+  $('#loginBtn')?.addEventListener('click', doLogin);
+  $('#adminPass')?.addEventListener('keydown', (e) => { if (e.key === 'Enter') doLogin(); });
+  $('#cancelLoginBtn')?.addEventListener('click', () => {
+    hideLogin();
+    history.replaceState(null, '', '#home');
+  });
+
+  function doLogin() {
+    const pass = $('#adminPass').value;
+    if (pass === getPass()) {
+      setLoggedIn(true);
+      hideLogin();
+      showAdminPanel();
+      updateAdminBodyClass();
+      applyLocksUI();
+      showToast('Login berhasil — Admin terbuka');
+      adminPanel.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      $('#loginError').textContent = 'Password salah.';
+      $('#adminPass').value = '';
+      $('#adminPass').focus();
+    }
+  }
+
+  // Logout
+  $('#logoutBtn')?.addEventListener('click', () => {
+    setLoggedIn(false);
+    hideAdminPanel();
+    updateAdminBodyClass();
+    applyLocksUI();
+    showToast('Logout berhasil');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // On load: if already logged in this session, show admin panel (but don't force scroll)
+  if (isLoggedIn()) {
+    showAdminPanel();
+    updateAdminBodyClass();
+    applyLocksUI();
+  } else {
+    hideAdminPanel();
+    updateAdminBodyClass();
+  }
+
+  // Hash #admin → require login
+  if (location.hash === '#admin') {
+    requireAdmin();
+  }
+  window.addEventListener('hashchange', () => {
+    if (location.hash === '#admin') requireAdmin();
+  });
+
+  // ===== Publish Update (public) =====
+  function loadPublicUpdates() {
+    const list = $('#publicUpdates');
+    if (!list) return;
+    let updates = [];
+    try { updates = JSON.parse(localStorage.getItem(UPDATES_KEY) || '[]'); } catch (_) {}
+    if (!updates.length) {
+      list.innerHTML = '<div class="empty-updates">Belum ada update publik. Admin bisa menambah lewat menu Admin.</div>';
+      return;
+    }
+    list.innerHTML = updates.map(u => `
+      <div class="update-item">
+        <div class="update-date">${u.date}</div>
+        <div class="update-text">${escapeHtml(u.text)}</div>
+      </div>
+    `).join('');
+  }
+
+  function escapeHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  $('#publishUpdateBtn')?.addEventListener('click', () => {
+    if (!isLoggedIn()) return showToast('Login dulu');
+    const text = ($('#updateInput').value || '').trim();
+    if (!text) return showToast('Isi update dulu');
+    let updates = [];
+    try { updates = JSON.parse(localStorage.getItem(UPDATES_KEY) || '[]'); } catch (_) {}
+    const now = new Date();
+    const dateStr = now.toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' });
+    updates.unshift({ date: dateStr, text });
+    localStorage.setItem(UPDATES_KEY, JSON.stringify(updates.slice(0, 50)));
+    $('#updateInput').value = '';
+    loadPublicUpdates();
+    showToast('Update dipublish ke publik');
+  });
+
+  // Load public updates on start (for visitors)
+  loadPublicUpdates();
+
+  // ===== Private Note =====
+  function loadPrivateNote() {
+    const el = $('#privateNote');
+    if (el) el.value = localStorage.getItem(NOTES_KEY) || '';
+  }
+  $('#saveNoteBtn')?.addEventListener('click', () => {
+    if (!isLoggedIn()) return;
+    localStorage.setItem(NOTES_KEY, $('#privateNote').value || '');
+    showToast('Catatan pribadi disimpan');
+  });
+
+  // ===== Change Password =====
+  $('#changePassBtn')?.addEventListener('click', () => {
+    if (!isLoggedIn()) return;
+    const p1 = $('#newPass').value;
+    const p2 = $('#newPass2').value;
+    if (!p1 || p1.length < 4) return showToast('Password minimal 4 karakter');
+    if (p1 !== p2) return showToast('Password tidak sama');
+    localStorage.setItem(PASS_KEY, p1);
+    $('#newPass').value = '';
+    $('#newPass2').value = '';
+    showToast('Password berhasil diganti');
+  });
+
+  // ===== Rest of UI (from previous) =====
+  const cursorGlow = $('#cursorGlow');
+  if (cursorGlow && window.matchMedia('(pointer: fine)').matches) {
+    document.addEventListener('mousemove', (e) => {
+      cursorGlow.style.left = e.clientX + 'px';
+      cursorGlow.style.top = e.clientY + 'px';
+    });
+  }
+
+  const navbar = $('#navbar');
+  const onScroll = () => navbar.classList.toggle('scrolled', window.scrollY > 40);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  const sections = $$('section[id]');
+  const navLinks = $$('.nav-link');
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach((sec) => {
+      if (window.scrollY >= sec.offsetTop - 120) current = sec.getAttribute('id');
+    });
+    navLinks.forEach((link) => {
+      const href = link.getAttribute('href');
+      if (href === '#admin') return; // don't auto-active admin
+      link.classList.toggle('active', href === '#' + current);
+    });
+  }, { passive: true });
+
+  $('#exploreBtn')?.addEventListener('click', () => $('#features')?.scrollIntoView({ behavior: 'smooth' }));
+  $('#openVaultBtn')?.addEventListener('click', () => $('#vault')?.scrollIntoView({ behavior: 'smooth' }));
+  $('#enterHubBtn')?.addEventListener('click', () => {
+    $('#vault')?.scrollIntoView({ behavior: 'smooth' });
+    showToast('Welcome to BRIANT HUB Vault');
+  });
+  $('#demoBtn')?.addEventListener('click', () => {
+    $('#gallery')?.scrollIntoView({ behavior: 'smooth' });
+    showToast('Theme switcher demo ready');
+  });
+
+  // Counters
+  const animateCounters = () => {
+    $$('[data-count]').forEach((el) => {
+      const target = parseInt(el.getAttribute('data-count'), 10);
+      const start = performance.now();
+      const step = (now) => {
+        const p = Math.min((now - start) / 1800, 1);
+        el.textContent = Math.floor((1 - Math.pow(1 - p, 3)) * target);
+        if (p < 1) requestAnimationFrame(step);
+        else el.textContent = target;
+      };
+      requestAnimationFrame(step);
+    });
+  };
+  const heroObs = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) { animateCounters(); heroObs.disconnect(); }
+  }, { threshold: 0.3 });
+  if ($('#home')) heroObs.observe($('#home'));
+
+  // Themes
+  $$('.theme-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const theme = btn.getAttribute('data-theme');
+      document.documentElement.setAttribute('data-theme', theme === 'cyan' ? '' : theme);
+      $$('.theme-btn').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      showToast('Theme: ' + btn.textContent.trim());
+    });
+  });
+
+  $$('.ext-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const name = btn.closest('.ext-card')?.querySelector('h3')?.textContent || 'Extension';
+      showToast(name + ' — Install queued');
+    });
+  });
+  $$('.vault-btn').forEach((btn) => btn.addEventListener('click', () => showToast(btn.textContent.trim() + ' — Feature ready')));
+  $$('.file-card').forEach((card) => {
+    card.addEventListener('click', () => showToast('Opening: ' + (card.querySelector('.file-name')?.textContent || 'File')));
+  });
+  $$('.sidebar-item').forEach((item) => {
+    item.addEventListener('click', () => {
+      $$('.sidebar-item').forEach((i) => i.classList.remove('active'));
+      item.classList.add('active');
+    });
+  });
+
+  // Particles
+  const canvas = $('#particles');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    let particles = [], w, h;
+    const resize = () => { w = canvas.width = innerWidth; h = canvas.height = innerHeight; };
+    const create = () => {
+      const count = Math.min(Math.floor((w * h) / 18000), 70);
+      particles = Array.from({ length: count }, () => ({
+        x: Math.random() * w, y: Math.random() * h,
+        r: Math.random() * 1.5 + 0.4,
+        vx: (Math.random() - 0.5) * 0.3, vy: (Math.random() - 0.5) * 0.3,
+        alpha: Math.random() * 0.5 + 0.1
+      }));
+    };
+    const getColor = () => getComputedStyle(document.documentElement).getPropertyValue('--primary').trim() || '#00f0ff';
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+      const color = getColor();
+      particles.forEach((p) => {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0) p.x = w; if (p.x > w) p.x = 0;
+        if (p.y < 0) p.y = h; if (p.y > h) p.y = 0;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = color; ctx.globalAlpha = p.alpha; ctx.fill();
+      });
+      ctx.globalAlpha = 0.07; ctx.strokeStyle = color; ctx.lineWidth = 0.5;
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x, dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 110) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(draw);
+    };
+    resize(); create(); draw();
+    addEventListener('resize', () => { resize(); create(); });
+  }
+
+  // Mobile menu
+  $('#mobileToggle')?.addEventListener('click', () => {
+    $('#navLinks')?.classList.toggle('open');
+  });
+
+  // Reveal
+  const revealEls = $$('.feature-card, .ext-card, .vault-window, .preview-card, .update-item');
+  const revObs = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+  revealEls.forEach((el) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
+    revObs.observe(el);
+  });
+
+
+  // ===== VAULT LOCK SYSTEM =====
+  const LOCKS_KEY = 'briant_hub_locks';
+
+  function getLocks() {
+    try { return JSON.parse(localStorage.getItem(LOCKS_KEY) || '{}'); } catch (_) { return {}; }
+  }
+  function setLocks(obj) {
+    localStorage.setItem(LOCKS_KEY, JSON.stringify(obj));
+  }
+  function isItemLocked(id) {
+    const locks = getLocks();
+    if (locks['all']) return true;
+    return !!locks[id];
+  }
+
+  function applyLocksUI() {
+    const locks = getLocks();
+    // File cards
+    document.querySelectorAll('.file-card[data-lock-id]').forEach((card) => {
+      const id = card.getAttribute('data-lock-id');
+      const locked = isItemLocked(id);
+      card.classList.toggle('locked', locked);
+    });
+    // Sidebar
+    document.querySelectorAll('.sidebar-item[data-lock-id]').forEach((item) => {
+      const id = item.getAttribute('data-lock-id');
+      // "All Files" only locked if specifically locked or all
+      const locked = (id === 'sidebar-all') ? !!locks['sidebar-all'] || !!locks['all'] : isItemLocked(id);
+      item.classList.toggle('locked', locked);
+    });
+    // Toggle buttons state
+    document.querySelectorAll('.lock-toggle-btn').forEach((btn) => {
+      const key = btn.getAttribute('data-lock');
+      const on = !!locks[key];
+      btn.classList.toggle('is-locked', on);
+      if (key === 'all') {
+        btn.textContent = on ? '🔓 Buka Semua' : 'Kunci Semua';
+      } else {
+        const base = btn.textContent.replace(/^[🔒🔓]\s*/, '');
+        btn.textContent = (on ? '🔒 ' : '') + base.replace(/^🔒\s*/, '');
+      }
+    });
+  }
+
+  function toggleLock(key) {
+    if (!isLoggedIn()) {
+      showToast('Login Admin dulu untuk mengunci');
+      return;
+    }
+    const locks = getLocks();
+    if (key === 'all') {
+      if (locks['all']) {
+        // unlock all
+        Object.keys(locks).forEach(k => delete locks[k]);
+      } else {
+        locks['all'] = true;
+      }
+    } else {
+      if (locks[key]) delete locks[key];
+      else locks[key] = true;
+      // if unlocking individual while "all" is on, turn off all
+      if (!locks[key] && locks['all']) delete locks['all'];
+    }
+    setLocks(locks);
+    applyLocksUI();
+    showToast(locks[key] || locks['all'] ? 'Item dikunci 🔒' : 'Item dibuka 🔓');
+  }
+
+  // Bind lock buttons
+  document.querySelectorAll('.lock-toggle-btn').forEach((btn) => {
+    btn.addEventListener('click', () => toggleLock(btn.getAttribute('data-lock')));
+  });
+
+  // Block click on locked items for public (and even admin sees lock, but admin can still manage via bar)
+  document.querySelectorAll('.file-card[data-lock-id]').forEach((card) => {
+    card.addEventListener('click', (e) => {
+      const id = card.getAttribute('data-lock-id');
+      if (isItemLocked(id)) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        showToast('🔒 Item dikunci oleh Admin');
+        return;
+      }
+    }, true);
+  });
+
+  document.querySelectorAll('.sidebar-item[data-lock-id]').forEach((item) => {
+    item.addEventListener('click', (e) => {
+      const id = item.getAttribute('data-lock-id');
+      const locks = getLocks();
+      const locked = (id === 'sidebar-all') ? !!locks['sidebar-all'] || !!locks['all'] : isItemLocked(id);
+      if (locked) {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+        showToast('🔒 Menu dikunci oleh Admin');
+        return;
+      }
+    }, true);
+  });
+
+  // Show admin-only bar when logged in
+  function updateAdminBodyClass() {
+    document.body.classList.toggle('is-admin', isLoggedIn());
+  }
+
+  // Hook into existing login/logout
+  const _origSetLoggedIn = setLoggedIn;
+  // We already have setLoggedIn - wrap by re-assigning after login success paths
+  // Patch: call updateAdminBodyClass after login/logout
+
+  // After successful login (in doLogin) - we need to inject calls
+  // Easier: observe and also call now
+  updateAdminBodyClass();
+  applyLocksUI();
+
+  // Admin card button scroll to vault lock bar
+  document.getElementById('adminGotoVaultLock')?.addEventListener('click', () => {
+    document.getElementById('vault')?.scrollIntoView({ behavior: 'smooth' });
+    showToast('Gunakan bar kunci di Vault');
+  });
+
+  // Re-apply after login - patch doLogin by listening storage isn't enough
+  // Override: monkey-patch by wrapping login button again is messy.
+  // Instead poll / call from existing handlers via Mutation - simplest: re-bind login success
+
+
+  // ===== BRIANT AI CHAT =====
+  const AI_KEY_STORE = 'briant_hub_ai_key';
+  const AI_PROVIDER_STORE = 'briant_hub_ai_provider';
+  const AI_SYSTEM = `Kamu adalah BRIANT Assistant, asisten resmi BRIANT HUB — personal digital hub berdesain neon futuristik.
+Jawab dalam bahasa yang dipakai user (biasanya Indonesia). Ringkas, jelas, membantu, dan ramah.
+Kamu bisa bantu soal web, coding, ide fitur, cara publish site, dan topik umum.
+Jika ditanya identitas, bilang kamu BRIANT AI di dalam BRIANT HUB.`;
+
+  function loadAiConfig() {
+    const key = localStorage.getItem(AI_KEY_STORE) || '';
+    const provider = localStorage.getItem(AI_PROVIDER_STORE) || 'gemini';
+    const keyEl = document.getElementById('aiApiKey');
+    const provEl = document.getElementById('aiProvider');
+    if (keyEl) keyEl.value = key;
+    if (provEl) provEl.value = provider;
+    updateAiStatus(!!key);
+  }
+
+  function updateAiStatus(ready) {
+    const dot = document.getElementById('aiStatusDot');
+    const text = document.getElementById('aiStatusText');
+    if (!dot || !text) return;
+    dot.classList.remove('offline', 'busy');
+    if (!ready) {
+      dot.classList.add('offline');
+      text.textContent = 'Perlu API key';
+    } else {
+      text.textContent = 'Siap';
+    }
+  }
+
+  function setAiBusy(busy) {
+    const dot = document.getElementById('aiStatusDot');
+    const text = document.getElementById('aiStatusText');
+    const send = document.getElementById('aiSendBtn');
+    const typing = document.getElementById('aiTyping');
+    if (dot) {
+      dot.classList.toggle('busy', busy);
+      if (!busy && !(localStorage.getItem(AI_KEY_STORE))) dot.classList.add('offline');
+      else if (!busy) dot.classList.remove('offline');
+    }
+    if (text) text.textContent = busy ? 'Mengetik...' : (localStorage.getItem(AI_KEY_STORE) ? 'Siap' : 'Perlu API key');
+    if (send) send.disabled = busy;
+    if (typing) typing.classList.toggle('show', busy);
+  }
+
+  function appendMsg(role, text) {
+    const box = document.getElementById('aiMessages');
+    if (!box) return;
+    const div = document.createElement('div');
+    div.className = 'ai-msg ' + (role === 'user' ? 'user' : 'bot');
+    const label = role === 'user' ? 'Kamu' : 'BRIANT AI';
+    // basic markdown-ish: code blocks and inline code
+    let htmlBody = escapeHtml(text)
+      .replace(/```([\s\S]*?)```/g, (_, c) => '<pre><code>' + c.trim() + '</code></pre>')
+      .replace(/`([^`]+)`/g, '<code>$1</code>')
+      .replace(/\n/g, '<br>');
+    div.innerHTML = '<div class="msg-label">' + label + '</div>' + htmlBody;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  async function callGemini(apiKey, messages) {
+    const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=' + encodeURIComponent(apiKey);
+    // Convert to Gemini format
+    const contents = [];
+    for (const m of messages) {
+      if (m.role === 'system') continue;
+      contents.push({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }]
+      });
+    }
+    // Prepend system as user turn if needed
+    const body = {
+      system_instruction: { parts: [{ text: AI_SYSTEM }] },
+      contents,
+      generationConfig: { temperature: 0.7, maxOutputTokens: 2048 }
+    };
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      const msg = data?.error?.message || res.statusText || 'Gemini error';
+      throw new Error(msg);
+    }
+    const text = data?.candidates?.[0]?.content?.parts?.map(p => p.text).join('') || '';
+    if (!text) throw new Error('Respons kosong dari Gemini');
+    return text;
+  }
+
+  async function callGroq(apiKey, messages) {
+    const url = 'https://api.groq.com/openai/v1/chat/completions';
+    const body = {
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'system', content: AI_SYSTEM }, ...messages.filter(m => m.role !== 'system')],
+      temperature: 0.7,
+      max_tokens: 2048
+    };
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + apiKey
+      },
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      const msg = data?.error?.message || res.statusText || 'Groq error';
+      throw new Error(msg);
+    }
+    return data?.choices?.[0]?.message?.content || '';
+  }
+
+  // conversation history for context
+  let aiHistory = [];
+
+  async function sendAiMessage(text) {
+    const apiKey = (localStorage.getItem(AI_KEY_STORE) || '').trim();
+    const provider = localStorage.getItem(AI_PROVIDER_STORE) || 'gemini';
+    if (!apiKey) {
+      showToast('Masukkan API key dulu (Gemini / Groq)');
+      document.getElementById('aiApiKey')?.focus();
+      return;
+    }
+    if (!text.trim()) return;
+
+    appendMsg('user', text.trim());
+    aiHistory.push({ role: 'user', content: text.trim() });
+    // keep last 12 turns
+    if (aiHistory.length > 24) aiHistory = aiHistory.slice(-24);
+
+    const input = document.getElementById('aiInput');
+    if (input) input.value = '';
+    setAiBusy(true);
+
+    try {
+      let reply;
+      if (provider === 'groq') {
+        reply = await callGroq(apiKey, aiHistory);
+      } else {
+        reply = await callGemini(apiKey, aiHistory);
+      }
+      aiHistory.push({ role: 'assistant', content: reply });
+      appendMsg('assistant', reply);
+    } catch (err) {
+      const msg = (err && err.message) ? err.message : String(err);
+      appendMsg('assistant', '⚠️ Error: ' + msg + '\n\nCek API key, kuota gratis, atau ganti provider.');
+      showToast('Gagal memanggil AI');
+    } finally {
+      setAiBusy(false);
+    }
+  }
+
+  document.getElementById('aiSaveKeyBtn')?.addEventListener('click', () => {
+    const key = (document.getElementById('aiApiKey')?.value || '').trim();
+    const provider = document.getElementById('aiProvider')?.value || 'gemini';
+    localStorage.setItem(AI_KEY_STORE, key);
+    localStorage.setItem(AI_PROVIDER_STORE, provider);
+    updateAiStatus(!!key);
+    showToast(key ? 'API key disimpan di browser ini' : 'API key dihapus');
+  });
+
+  document.getElementById('aiProvider')?.addEventListener('change', () => {
+    localStorage.setItem(AI_PROVIDER_STORE, document.getElementById('aiProvider').value);
+  });
+
+  document.getElementById('aiSendBtn')?.addEventListener('click', () => {
+    sendAiMessage(document.getElementById('aiInput')?.value || '');
+  });
+
+  document.getElementById('aiInput')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendAiMessage(document.getElementById('aiInput').value);
+    }
+  });
+
+  document.getElementById('aiClearBtn')?.addEventListener('click', () => {
+    aiHistory = [];
+    const box = document.getElementById('aiMessages');
+    if (box) {
+      box.innerHTML = `<div class="ai-msg bot"><div class="msg-label">BRIANT AI</div>Chat direset. Silakan kirim pesan baru.</div>`;
+    }
+    showToast('Chat dibersihkan');
+  });
+
+  document.querySelectorAll('.ai-quick button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const q = btn.getAttribute('data-q');
+      if (q) sendAiMessage(q);
+    });
+  });
+
+  loadAiConfig();
+
+  console.log('%c BRIANT HUB v2 ', 'background:#00f0ff;color:#05050a;font-weight:bold;padding:4px 8px;');
+})();
+  </script>
+</body>
+</html>
